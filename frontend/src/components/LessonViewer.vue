@@ -279,8 +279,8 @@ onBeforeUnmount(() => {
       <header class="lesson-header">
         <div class="lesson-header-copy">
           <p class="lesson-kicker">课堂讲解</p>
-          <h2>{{ lesson.title }}</h2>
-          <p class="lesson-summary">{{ lesson.summary }}</p>
+          <h2 v-html="lesson.title"></h2>
+          <p class="lesson-summary" v-html="lesson.summary"></p>
         </div>
         <div class="lesson-header-meta">
           <span class="lesson-count">{{ scenes.length }} 个讲解步骤</span>
@@ -320,7 +320,7 @@ onBeforeUnmount(() => {
           <p class="subtitle-label">
             {{ isSceneSpeaking ? "同步字幕" : "当前字幕" }}
           </p>
-          <p class="subtitle-text">{{ subtitleText }}</p>
+          <p class="subtitle-text" v-html="subtitleText"></p>
           <div class="subtitle-progress">
             <span :style="{ transform: `scaleX(${subtitleProgress})` }"></span>
           </div>
@@ -377,9 +377,8 @@ onBeforeUnmount(() => {
             v-for="(paragraph, index) in reviewParagraphs"
             :key="`${index}-${paragraph.slice(0, 12)}`"
             class="review-paragraph"
-          >
-            {{ paragraph }}
-          </p>
+            v-html="paragraph"
+          ></p>
         </div>
       </section>
     </template>
