@@ -20,7 +20,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["scene-change"]);
+const emit = defineEmits(["scene-change", "playback-state"]);
 
 const support = getSpeechSupport(typeof window !== "undefined" ? window : undefined);
 const isSupported = support.supported;
@@ -29,6 +29,7 @@ const isPaused = ref(false);
 const speakingSceneId = ref("");
 const playbackError = ref("");
 const rememberedSceneId = ref("");
+const playbackRunId = ref(0);
 
 const allQueue = computed(() => buildNarrationQueue(props.lesson));
 const currentQueue = computed(() =>
@@ -38,9 +39,13 @@ const currentQueue = computed(() =>
     rememberedSceneId.value,
   ),
 );
+const speakingSceneLabel = computed(() => {
+  const currentItem = allQueue.value.find((item) => item.id === speakingSceneId.value);
+  return currentItem?.label || "";
+});
 const statusText = computed(() => {
-  if (speakingSceneId.value) {
-    return `正在朗读：${speakingSceneId.value}`;
+  if (speakingSceneLabel.value) {
+    return `正在讲解：${speakingSceneLabel.value}`;
   }
   if (playbackError.value) {
     return playbackError.value;
@@ -48,7 +53,7 @@ const statusText = computed(() => {
   if (!isSupported) {
     return getUnsupportedMessage(support.reason);
   }
-  return "";
+  return "点击开始朗读后，字幕会按照讲解节奏自动同步。";
 });
 const isWarningStatus = computed(() => !isSupported || Boolean(playbackError.value));
 
@@ -86,6 +91,16 @@ function resetRememberedScene(lesson, selectedSceneId = "") {
   rememberedSceneId.value = selectionTracker.getRememberedSceneId();
 }
 
+function emitPlaybackState() {
+  emit("playback-state", {
+    runId: playbackRunId.value,
+    isPlaying: isPlaying.value,
+    isPaused: isPaused.value,
+    sceneId: speakingSceneId.value,
+    errorMessage: playbackError.value,
+  });
+}
+
 function stopPlayback(options = {}) {
   playbackMachine?.stop(options);
   if (!playbackMachine) {
@@ -102,6 +117,7 @@ function startPlayback(queue) {
   if (!playbackMachine || !queue.length) {
     return;
   }
+  playbackRunId.value += 1;
   playbackMachine.start(queue);
 }
 
@@ -136,6 +152,16 @@ watch(
   },
 );
 
+watch(
+  [playbackRunId, isPlaying, isPaused, speakingSceneId, playbackError],
+  () => {
+    emitPlaybackState();
+  },
+  {
+    immediate: true,
+  },
+);
+
 onBeforeUnmount(() => {
   stopPlayback({ clearError: true });
 });
@@ -145,9 +171,8 @@ onBeforeUnmount(() => {
   <section class="voice-shell">
     <div class="voice-copy">
       <p class="voice-label">语音讲解</p>
-      <h3>直接朗读 AI 生成的讲解稿</h3>
       <p class="voice-description">
-        默认使用浏览器内置语音。你可以播放全部步骤，也可以只播放当前高亮的那一张 SVG。
+        直接朗读课堂讲解，舞台区会跟随切换分镜与字幕。
       </p>
     </div>
 
@@ -186,11 +211,7 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
-    <p
-      v-if="statusText"
-      class="voice-status"
-      :class="{ 'voice-status--warning': isWarningStatus }"
-    >
+    <p class="voice-status" :class="{ 'voice-status--warning': isWarningStatus }">
       {{ statusText }}
     </p>
   </section>
@@ -199,15 +220,17 @@ onBeforeUnmount(() => {
 <style scoped>
 .voice-shell {
   display: grid;
-  gap: 18px;
-  padding: 24px 28px;
-  border-radius: 24px;
+  gap: 14px;
+  padding: 18px 22px;
+  border-radius: 28px;
   background: #ffffff;
+  border: 1px solid rgba(0, 113, 227, 0.12);
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 18px 40px;
 }
 
 .voice-copy {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .voice-label {
@@ -216,17 +239,10 @@ onBeforeUnmount(() => {
   font-size: 14px;
 }
 
-h3 {
-  margin: 0;
-  font-size: 28px;
-  line-height: 1.14;
-  color: var(--text-primary);
-}
-
 .voice-description {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.47;
 }
 
 .voice-actions {
@@ -236,12 +252,13 @@ h3 {
 }
 
 .voice-button {
-  min-width: 108px;
+  min-width: 112px;
   padding: 10px 18px;
   border-radius: 999px;
   border: 1px solid var(--border-soft);
   background: #ffffff;
   color: var(--text-primary);
+  font: inherit;
 }
 
 .voice-button--primary {
@@ -258,6 +275,7 @@ h3 {
 .voice-status {
   margin: 0;
   color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .voice-status--warning {

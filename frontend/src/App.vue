@@ -28,6 +28,13 @@ const previewUrl = ref("");
 const activeSceneId = ref("");
 const appState = ref(createLessonAppState());
 const isRetryableError = ref(false);
+const lessonPlayback = ref({
+  runId: 0,
+  isPlaying: false,
+  isPaused: false,
+  sceneId: "",
+  errorMessage: "",
+});
 const MAX_UPLOAD_MEGABYTES = 8;
 
 let activeAbortController = null;
@@ -274,6 +281,13 @@ function onRetry() {
   onSubmit();
 }
 
+function onPlaybackStateChange(nextPlaybackState) {
+  lessonPlayback.value = {
+    ...lessonPlayback.value,
+    ...nextPlaybackState,
+  };
+}
+
 function onHistorySelect(entry) {
   cancelActiveRequest();
   clearSelectedFilePreview();
@@ -340,16 +354,18 @@ onBeforeUnmount(() => {
     </section>
 
     <section class="result-shell">
+      <LessonViewer
+        :lesson="lesson"
+        :active-scene-id="activeSceneId"
+        :playback-state="lessonPlayback"
+        @scene-select="onSceneChange"
+      />
       <VoiceControls
         :key="voiceControlsKey"
         :lesson="lesson"
         :selected-scene-id="activeSceneId"
         @scene-change="onSceneChange"
-      />
-      <LessonViewer
-        :lesson="lesson"
-        :active-scene-id="activeSceneId"
-        @scene-select="onSceneChange"
+        @playback-state="onPlaybackStateChange"
       />
     </section>
 
@@ -498,10 +514,7 @@ onBeforeUnmount(() => {
 
 .result-shell {
   display: grid;
-  gap: 20px;
-  padding: 24px;
-  border-radius: 32px;
-  background: #f5f5f7;
+  gap: 18px;
 }
 
 .history-shell {
