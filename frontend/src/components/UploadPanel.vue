@@ -63,12 +63,11 @@ onBeforeUnmount(() => {
 <template>
   <section class="upload-shell">
     <div class="upload-copy">
-      <p class="eyebrow">AI Teacher</p>
-      <h1>上传一张图片，让 AI 老师自动画图讲题。</h1>
+      <p class="eyebrow">Open the scene</p>
+      <h2>上传图片，点亮这场 AI 课堂放映。</h2>
       <p class="description">
         支持题目截图、手写草稿、教材页面或几何图。系统会调用你本地 `9109`
-        端口的 AI，自动生成 SVG 分镜和对应的中文讲解稿。也支持直接
-        `Ctrl+V` / `Cmd+V` 粘贴图片。
+        端口的 AI，自动生成 SVG 分镜和中文讲解稿，也支持直接粘贴截图。
       </p>
     </div>
 
@@ -116,10 +115,13 @@ onBeforeUnmount(() => {
 .upload-shell {
   display: grid;
   gap: 24px;
-  padding: 32px;
-  border-radius: var(--radius-card);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 30px;
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .upload-copy {
@@ -129,36 +131,38 @@ onBeforeUnmount(() => {
 
 .eyebrow {
   margin: 0;
-  color: #2997ff;
-  font-size: 14px;
-  letter-spacing: -0.22px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
-h1 {
+h2 {
   margin: 0;
-  font-size: clamp(36px, 5vw, 56px);
-  line-height: 1.07;
-  letter-spacing: -0.28px;
-  font-weight: 600;
+  font-size: clamp(32px, 4vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
 
 .description {
   margin: 0;
   max-width: 560px;
-  color: rgba(255, 255, 255, 0.76);
-  font-size: 17px;
-  line-height: 1.47;
-  letter-spacing: -0.37px;
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.65;
 }
 
 .dropzone {
   display: grid;
   place-items: center;
-  min-height: 320px;
+  min-height: 340px;
   padding: 18px;
   border-radius: 28px;
-  border: 1px dashed rgba(255, 255, 255, 0.24);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background:
+    radial-gradient(circle at top, rgba(243, 177, 94, 0.12), transparent 45%),
+    rgba(255, 255, 255, 0.05);
 }
 
 .dropzone-input {
@@ -177,7 +181,7 @@ h1 {
 }
 
 .placeholder span {
-  color: rgba(255, 255, 255, 0.64);
+  color: var(--text-secondary);
 }
 
 .preview-wrap {
@@ -203,7 +207,7 @@ h1 {
 
 .file-name {
   margin: 0;
-  color: rgba(255, 255, 255, 0.72);
+  color: rgba(255, 255, 255, 0.74);
   word-break: break-all;
 }
 
@@ -211,9 +215,11 @@ h1 {
   border: none;
   border-radius: 999px;
   padding: 12px 22px;
-  background: #0071e3;
-  color: #ffffff;
+  background: linear-gradient(180deg, #ffd08c, #f3b15e);
+  color: #1c1206;
   font-size: 17px;
+  font-weight: 700;
+  box-shadow: 0 10px 24px rgba(243, 177, 94, 0.22);
 }
 
 .primary-button:disabled {
@@ -223,7 +229,7 @@ h1 {
 
 .error-text {
   margin: 0;
-  color: #ff8a8a;
+  color: #ffaeae;
 }
 
 @media (max-width: 720px) {

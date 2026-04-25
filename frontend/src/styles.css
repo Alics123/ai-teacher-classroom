@@ -1,27 +1,30 @@
 :root {
-  color-scheme: light;
+  color-scheme: dark;
   font-family:
-    "SF Pro Text",
-    "SF Pro Icons",
-    "Helvetica Neue",
-    Helvetica,
-    Arial,
-    sans-serif;
-  background: #000000;
-  color: #f5f5f7;
+    "Iowan Old Style",
+    "Palatino Linotype",
+    "Book Antiqua",
+    "Times New Roman",
+    serif;
+  background:
+    radial-gradient(circle at top, rgba(255, 196, 112, 0.12), transparent 30%),
+    radial-gradient(circle at 20% 20%, rgba(80, 120, 255, 0.16), transparent 32%),
+    #050507;
+  color: #f5f1e8;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   --surface-light: #f5f5f7;
   --surface-white: #ffffff;
-  --surface-dark: #000000;
-  --text-primary: #1d1d1f;
-  --text-secondary: rgba(29, 29, 31, 0.72);
-  --text-muted: rgba(29, 29, 31, 0.54);
-  --accent: #0071e3;
-  --border-soft: rgba(29, 29, 31, 0.12);
-  --shadow-soft: rgba(0, 0, 0, 0.14) 0px 20px 40px;
+  --surface-dark: #050507;
+  --text-primary: #f5f1e8;
+  --text-secondary: rgba(245, 241, 232, 0.76);
+  --text-muted: rgba(245, 241, 232, 0.56);
+  --accent: #f3b15e;
+  --accent-strong: #ffcf86;
+  --border-soft: rgba(255, 255, 255, 0.1);
+  --shadow-soft: rgba(0, 0, 0, 0.34) 0px 20px 40px;
   --radius-card: 28px;
   --radius-pill: 999px;
 }
@@ -38,7 +41,21 @@ body,
 }
 
 body {
-  background: #000000;
+  background:
+    radial-gradient(circle at top, rgba(255, 196, 112, 0.1), transparent 28%),
+    linear-gradient(180deg, #0a0a0d 0%, #050507 42%, #09090c 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, black 55%, transparent 100%);
 }
 
 button,
@@ -52,5 +69,5 @@ button {
 }
 
 a {
-  color: var(--accent);
+  color: var(--accent-strong);
 }

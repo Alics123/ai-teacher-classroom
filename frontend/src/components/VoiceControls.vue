@@ -170,9 +170,9 @@ onBeforeUnmount(() => {
 <template>
   <section class="voice-shell">
     <div class="voice-copy">
-      <p class="voice-label">语音讲解</p>
+      <p class="voice-label">Narration deck</p>
       <p class="voice-description">
-        直接朗读课堂讲解，舞台区会跟随切换分镜与字幕。
+        语音旁白会把整场课堂串起来，舞台区也会同步切换分镜与字幕。
       </p>
     </div>
 
@@ -221,11 +221,11 @@ onBeforeUnmount(() => {
 .voice-shell {
   display: grid;
   gap: 14px;
-  padding: 18px 22px;
+  padding: 20px 22px;
   border-radius: 28px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 113, 227, 0.12);
-  box-shadow: rgba(0, 0, 0, 0.06) 0px 18px 40px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .voice-copy {
@@ -235,14 +235,16 @@ onBeforeUnmount(() => {
 
 .voice-label {
   margin: 0;
-  color: var(--accent);
-  font-size: 14px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .voice-description {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.47;
+  line-height: 1.6;
 }
 
 .voice-actions {
@@ -255,16 +257,16 @@ onBeforeUnmount(() => {
   min-width: 112px;
   padding: 10px 18px;
   border-radius: 999px;
-  border: 1px solid var(--border-soft);
-  background: #ffffff;
-  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #f5f1e8;
   font: inherit;
 }
 
 .voice-button--primary {
   border-color: transparent;
-  background: var(--accent);
-  color: #ffffff;
+  background: linear-gradient(180deg, #ffd08c, #f3b15e);
+  color: #1c1206;
 }
 
 .voice-button:disabled {
@@ -279,6 +281,6 @@ onBeforeUnmount(() => {
 }
 
 .voice-status--warning {
-  color: #d15700;
+  color: #ffcf86;
 }
 </style>
