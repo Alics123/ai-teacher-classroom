@@ -223,9 +223,14 @@ onBeforeUnmount(() => {
   gap: 14px;
   padding: 20px 22px;
   border-radius: 28px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 244, 236, 0.92)),
+    #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 18px 44px rgba(96, 77, 51, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  color: #2a231d;
 }
 
 .voice-copy {
@@ -235,7 +240,7 @@ onBeforeUnmount(() => {
 
 .voice-label {
   margin: 0;
-  color: var(--accent-strong);
+  color: #d7922d;
   font-size: 12px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -243,8 +248,8 @@ onBeforeUnmount(() => {
 
 .voice-description {
   margin: 0;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  color: rgba(42, 35, 29, 0.72);
+  line-height: 1.65;
 }
 
 .voice-actions {
@@ -257,16 +262,17 @@ onBeforeUnmount(() => {
   min-width: 112px;
   padding: 10px 18px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
-  color: #f5f1e8;
+  border: 1px solid rgba(42, 35, 29, 0.08);
+  background: rgba(255, 255, 255, 0.96);
+  color: #2a231d;
   font: inherit;
 }
 
 .voice-button--primary {
   border-color: transparent;
-  background: linear-gradient(180deg, #ffd08c, #f3b15e);
-  color: #1c1206;
+  background: linear-gradient(180deg, #ffd79e, #d7922d);
+  color: #fffaf0;
+  box-shadow: 0 10px 20px rgba(215, 146, 45, 0.18);
 }
 
 .voice-button:disabled {
@@ -276,11 +282,11 @@ onBeforeUnmount(() => {
 
 .voice-status {
   margin: 0;
-  color: var(--text-secondary);
+  color: rgba(42, 35, 29, 0.68);
   font-size: 14px;
 }
 
 .voice-status--warning {
-  color: #ffcf86;
+  color: #b06a12;
 }
 </style>

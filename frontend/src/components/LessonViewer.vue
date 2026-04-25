@@ -387,4 +387,336 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-undefined</style>
+.lesson-shell {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 30px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(250, 247, 241, 0.88));
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 24px 60px rgba(98, 77, 45, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  color: #2a231d;
+}
+
+.lesson-empty {
+  display: grid;
+  place-items: center;
+  min-height: 420px;
+  text-align: center;
+}
+
+.empty-title {
+  margin: 0 0 8px;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.empty-description {
+  margin: 0;
+  max-width: 420px;
+  color: rgba(42, 35, 29, 0.68);
+}
+
+.lesson-header,
+.stage-head,
+.course-review-head {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.lesson-header-copy,
+.stage-head-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.lesson-kicker,
+.stage-label,
+.review-label {
+  margin: 0;
+  color: #d7922d;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+h2,
+h3,
+.review-title {
+  margin: 0;
+  color: #2a231d;
+}
+
+h2 {
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: 1.04;
+}
+
+.lesson-summary,
+.stage-hint,
+.course-review-summary p,
+.review-paragraph {
+  color: rgba(42, 35, 29, 0.72);
+}
+
+.lesson-count {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(215, 146, 45, 0.1);
+  color: #d7922d;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.lesson-stage {
+  display: grid;
+  gap: 14px;
+}
+
+.stage-hint {
+  margin: 0;
+  text-align: right;
+  font-size: 14px;
+}
+
+.stage-frame {
+  position: relative;
+  padding: 18px;
+  border-radius: 32px;
+  background: linear-gradient(180deg, #111111, #0a0a0b);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 60px rgba(0, 0, 0, 0.25);
+}
+
+.stage-board {
+  position: relative;
+  min-height: 500px;
+  padding: 18px;
+  border-radius: 26px;
+  background: radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 40%), #141414;
+  overflow: hidden;
+}
+
+.stage-board-grid,
+.stage-board-spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stage-board-grid {
+  opacity: 0.08;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.16) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.stage-board-spotlight {
+  background: radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.2), transparent 50%);
+}
+
+.stage-svg-shell {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 464px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #fefefe, #f5f2ec);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.stage-svg {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 940px);
+  padding: 10px;
+}
+
+.stage-svg :deep(svg) {
+  width: 100%;
+  height: auto;
+}
+
+.stage-pointer {
+  position: absolute;
+  top: 18%;
+  left: 14%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #d7922d;
+  box-shadow: 0 0 0 10px rgba(215, 146, 45, 0.14), 0 0 30px rgba(215, 146, 45, 0.35);
+}
+
+.subtitle-shell {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.subtitle-label {
+  margin: 0;
+  color: #d7922d;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.subtitle-text {
+  margin: 0;
+  min-height: 2.8em;
+  font-size: clamp(18px, 2.4vw, 26px);
+  line-height: 1.55;
+  color: #2a231d;
+}
+
+.subtitle-progress {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(215, 146, 45, 0.14);
+  overflow: hidden;
+}
+
+.subtitle-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #ffd79e, #d7922d);
+}
+
+.scene-rail {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.scene-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(42, 35, 29, 0.08);
+  background: rgba(255, 255, 255, 0.84);
+  color: #2a231d;
+  cursor: pointer;
+  font: inherit;
+}
+
+.scene-pill--active {
+  border-color: rgba(215, 146, 45, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(215, 146, 45, 0.12);
+}
+
+.scene-pill:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.scene-pill-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(215, 146, 45, 0.12);
+  color: #d7922d;
+  font-size: 12px;
+}
+
+.lesson-status {
+  margin: 0;
+  color: #d7922d;
+  font-size: 14px;
+}
+
+.course-review {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.course-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.review-action {
+  min-width: 112px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(42, 35, 29, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  color: #2a231d;
+  font: inherit;
+}
+
+.review-action--primary {
+  border-color: transparent;
+  background: linear-gradient(180deg, #ffd79e, #d7922d);
+  color: #fffaf0;
+  box-shadow: 0 10px 22px rgba(215, 146, 45, 0.2);
+}
+
+.course-review-summary p,
+.review-paragraph {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.course-review-body {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 980px) {
+  .lesson-header,
+  .stage-head,
+  .course-review-head {
+    flex-direction: column;
+  }
+
+  .stage-hint {
+    text-align: left;
+  }
+}
+
+@media (max-width: 720px) {
+  .lesson-shell {
+    padding: 18px;
+    border-radius: 24px;
+  }
+
+  .stage-board {
+    min-height: 360px;
+  }
+
+  .stage-svg-shell {
+    min-height: 300px;
+  }
+
+  .scene-pill {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+</style>

@@ -114,32 +114,35 @@ onBeforeUnmount(() => {
 <style scoped>
 .upload-shell {
   display: grid;
-  gap: 24px;
-  padding: 30px;
-  border-radius: 28px;
+  gap: 22px;
+  padding: 26px;
+  border-radius: 30px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
-    rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 244, 236, 0.92)),
+    #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 24px 48px rgba(98, 77, 45, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
 .upload-copy {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .eyebrow {
   margin: 0;
-  color: var(--accent-strong);
+  color: #d7922d;
   font-size: 12px;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
 }
 
 h2 {
   margin: 0;
-  font-size: clamp(32px, 4vw, 56px);
+  color: #2a231d;
+  font-size: clamp(30px, 4vw, 54px);
   line-height: 1.02;
   letter-spacing: -0.04em;
   text-wrap: balance;
@@ -148,9 +151,9 @@ h2 {
 .description {
   margin: 0;
   max-width: 560px;
-  color: var(--text-secondary);
+  color: rgba(42, 35, 29, 0.72);
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.7;
 }
 
 .dropzone {
@@ -158,11 +161,11 @@ h2 {
   place-items: center;
   min-height: 340px;
   padding: 18px;
-  border-radius: 28px;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 26px;
+  border: 1px dashed rgba(42, 35, 29, 0.14);
   background:
-    radial-gradient(circle at top, rgba(243, 177, 94, 0.12), transparent 45%),
-    rgba(255, 255, 255, 0.05);
+    radial-gradient(circle at top, rgba(215, 146, 45, 0.1), transparent 45%),
+    rgba(255, 255, 255, 0.72);
 }
 
 .dropzone-input {
@@ -177,11 +180,12 @@ h2 {
 
 .placeholder p {
   margin: 0;
+  color: #2a231d;
   font-size: 24px;
 }
 
 .placeholder span {
-  color: var(--text-secondary);
+  color: rgba(42, 35, 29, 0.72);
 }
 
 .preview-wrap {
@@ -207,7 +211,7 @@ h2 {
 
 .file-name {
   margin: 0;
-  color: rgba(255, 255, 255, 0.74);
+  color: rgba(42, 35, 29, 0.72);
   word-break: break-all;
 }
 
@@ -215,11 +219,13 @@ h2 {
   border: none;
   border-radius: 999px;
   padding: 12px 22px;
-  background: linear-gradient(180deg, #ffd08c, #f3b15e);
-  color: #1c1206;
+  background: linear-gradient(180deg, #ffd79e, #d7922d);
+  color: #fffaf0;
   font-size: 17px;
   font-weight: 700;
-  box-shadow: 0 10px 24px rgba(243, 177, 94, 0.22);
+  box-shadow:
+    0 10px 24px rgba(215, 146, 45, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .primary-button:disabled {
@@ -229,12 +235,12 @@ h2 {
 
 .error-text {
   margin: 0;
-  color: #ffaeae;
+  color: #b06a12;
 }
 
 @media (max-width: 720px) {
   .upload-shell {
-    padding: 24px;
+    padding: 22px;
   }
 
   .upload-actions {

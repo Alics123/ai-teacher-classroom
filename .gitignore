@@ -1,8 +1,11 @@
 .venv/
 .runtime/
+node_modules/
 frontend/node_modules/
+frontend/.npm-cache/
 frontend/dist/
 backend/__pycache__/
 backend/.pytest_cache/
 backend/app/__pycache__/
 backend/tests/__pycache__/
+*.log
