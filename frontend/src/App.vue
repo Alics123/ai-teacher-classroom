@@ -345,6 +345,16 @@ onBeforeUnmount(() => {
       </button>
     </section>
 
+    <section class="hero-summary">
+      <div>
+        <p class="hero-summary-kicker">课堂工作台</p>
+        <h2>把一张题图变成一堂可讲、可看、可回放的课</h2>
+      </div>
+      <p class="hero-summary-text">
+        上传一张题目图片后，系统会自动完成识别、分镜、讲稿与质检，并把结果组织成可播放的教学课堂。
+      </p>
+    </section>
+
     <section class="stage-shell">
       <div class="stage-shell-head">
         <div class="stage-flow-head">
@@ -352,7 +362,7 @@ onBeforeUnmount(() => {
           <h3>课堂生成进度</h3>
         </div>
         <p class="stage-shell-meta">
-          这不是装饰性的加载条，而是把讲解生成拆成可以理解的阶段。
+          生成过程会按步骤展示，方便你知道系统正在做什么。
         </p>
       </div>
       <ol class="stage-flow-list">
@@ -393,11 +403,11 @@ onBeforeUnmount(() => {
         />
         <section class="result-note">
           <p class="result-note-kicker">教学说明</p>
-          <h3>三步完成一张图片的讲解</h3>
+          <h3>输出内容包括分镜、讲稿和总结</h3>
           <ol>
-            <li>识别题目中的关键对象与问题。</li>
-            <li>组织成适合课堂展示的分镜。</li>
-            <li>生成可朗读、可检查的教学脚本。</li>
+            <li>先判断图片里的题型和知识点。</li>
+            <li>再生成适合课堂讲解的分镜。</li>
+            <li>最后补齐可朗读的讲稿与质检结果。</li>
           </ol>
         </section>
       </aside>
@@ -435,16 +445,21 @@ onBeforeUnmount(() => {
   gap: 22px;
   min-height: 100vh;
   padding: 20px;
-  background: transparent;
+  background:
+    radial-gradient(circle at top left, rgba(255, 220, 166, 0.22), transparent 28%),
+    radial-gradient(circle at top right, rgba(215, 146, 45, 0.14), transparent 22%),
+    linear-gradient(180deg, #fffaf2 0%, #f7f2ea 100%);
 }
 
 .hero-shell,
+.hero-summary,
 .result-shell,
 .history-shell {
   display: grid;
 }
 
-.status-shell {
+.status-shell,
+.hero-summary {
   display: flex;
   gap: 14px;
   align-items: center;
@@ -477,7 +492,8 @@ onBeforeUnmount(() => {
 }
 
 .status-copy,
-.stage-flow-head {
+.stage-flow-head,
+.hero-summary > div {
   display: grid;
   gap: 4px;
 }
@@ -489,11 +505,17 @@ onBeforeUnmount(() => {
 .history-file,
 .history-time,
 .stage-flow-kicker,
-.stage-flow h3 {
+.stage-flow h3,
+.hero-summary-kicker,
+.hero-summary h2,
+.hero-summary-text {
   margin: 0;
 }
 
-.status-label {
+.status-label,
+.hero-summary-kicker,
+.stage-flow-kicker,
+.history-kicker {
   color: #d7922d;
   font-size: 12px;
   letter-spacing: 0.18em;
@@ -506,6 +528,26 @@ onBeforeUnmount(() => {
   padding: 10px 16px;
   background: rgba(255, 255, 255, 0.96);
   color: #2a231d;
+}
+
+.hero-summary {
+  align-items: flex-start;
+}
+
+.hero-summary h2 {
+  font-size: 28px;
+  line-height: 1.15;
+  color: #2a231d;
+}
+
+.hero-summary .status-progress {
+  min-width: 180px;
+}
+
+.hero-summary-text {
+  max-width: 520px;
+  color: rgba(42, 35, 29, 0.74);
+  line-height: 1.7;
 }
 
 .stage-shell {
@@ -581,6 +623,10 @@ onBeforeUnmount(() => {
 
 .stage-flow-item--done .stage-flow-dot {
   background: #d7922d;
+}
+
+.stage-flow-item--done {
+  opacity: 0.92;
 }
 
 .stage-flow-item--active {
@@ -726,6 +772,13 @@ onBeforeUnmount(() => {
   .result-shell {
     grid-template-columns: 1fr;
   }
+
+  .status-shell,
+  .hero-summary,
+  .stage-shell-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 @media (min-width: 961px) {
@@ -740,9 +793,14 @@ onBeforeUnmount(() => {
   }
 
   .status-shell,
+  .hero-summary,
   .stage-shell-head {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .hero-summary h2 {
+    font-size: 24px;
   }
 }
 </style>
