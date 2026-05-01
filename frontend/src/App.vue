@@ -345,10 +345,15 @@ onBeforeUnmount(() => {
       </button>
     </section>
 
-    <section class="stage-flow">
-      <div class="stage-flow-head">
-        <p class="stage-flow-kicker">阶段流程</p>
-        <h3>课堂生成进度</h3>
+    <section class="stage-shell">
+      <div class="stage-shell-head">
+        <div class="stage-flow-head">
+          <p class="stage-flow-kicker">阶段流程</p>
+          <h3>课堂生成进度</h3>
+        </div>
+        <p class="stage-shell-meta">
+          这不是装饰性的加载条，而是把讲解生成拆成可以理解的阶段。
+        </p>
       </div>
       <ol class="stage-flow-list">
         <li
