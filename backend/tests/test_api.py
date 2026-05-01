@@ -72,6 +72,7 @@ def test_generate_lesson_endpoint_returns_structured_payload(monkeypatch):
     assert data["title"] == "三角形面积"
     assert data["stage"] == "completed"
     assert data["progress"] == 1
+    assert data["detail"]
     assert data["scenes"][0]["id"] == "scene-1"
     assert data["fullNarration"] == "第一步先找到底和高。"
 

@@ -37,12 +37,6 @@ def _extract_upstream_error_message(response: httpx.Response) -> str:
 
 
 async def generate_lesson_from_upload(file: UploadFile) -> dict:
-    stage = {
-        "stage": "validating_upload",
-        "progress": 0.08,
-        "detail": "正在检查图片类型与大小。",
-    }
-
     content_type = (file.content_type or "").lower()
     if not content_type.startswith("image/"):
         raise LessonGenerationError(
@@ -72,6 +66,9 @@ async def generate_lesson_from_upload(file: UploadFile) -> dict:
             image_bytes=image_bytes,
             mime_type=content_type,
         )
+        lesson.stage = lesson.stage or "completed"
+        lesson.progress = 1
+        lesson.detail = lesson.detail or "课堂讲解已生成完成。"
     except httpx.RequestError as exc:
         raise LessonGenerationError(
             status_code=503,
