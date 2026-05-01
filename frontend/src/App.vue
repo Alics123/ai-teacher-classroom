@@ -504,6 +504,34 @@ onBeforeUnmount(() => {
   color: #2a231d;
 }
 
+.stage-shell {
+  display: grid;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 244, 236, 0.92)),
+    #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow:
+    0 18px 44px rgba(96, 77, 51, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.stage-shell-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.stage-shell-meta {
+  margin: 0;
+  max-width: 480px;
+  color: rgba(42, 35, 29, 0.72);
+  line-height: 1.6;
+}
+
 .stage-flow-list {
   list-style: none;
   display: grid;
@@ -514,21 +542,47 @@ onBeforeUnmount(() => {
 
 .stage-flow-item {
   display: flex;
-  align-items: center;
-  gap: 10px;
-  color: rgba(42, 35, 29, 0.65);
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  color: rgba(42, 35, 29, 0.64);
+}
+
+.stage-flow-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.stage-flow-copy strong {
+  font-size: 15px;
+}
+
+.stage-flow-copy span {
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .stage-flow-dot {
   width: 12px;
   height: 12px;
+  margin-top: 4px;
   border-radius: 50%;
   background: rgba(42, 35, 29, 0.18);
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+  flex: 0 0 auto;
 }
 
 .stage-flow-item--done .stage-flow-dot {
   background: #d7922d;
+}
+
+.stage-flow-item--active {
+  background: linear-gradient(180deg, rgba(255, 215, 158, 0.18), rgba(255, 255, 255, 0.84));
+  border-color: rgba(215, 146, 45, 0.2);
+  color: #2a231d;
 }
 
 .stage-flow-item--active .stage-flow-dot {
@@ -681,7 +735,8 @@ onBeforeUnmount(() => {
     padding: 14px;
   }
 
-  .status-shell {
+  .status-shell,
+  .stage-shell-head {
     align-items: stretch;
     flex-direction: column;
   }
