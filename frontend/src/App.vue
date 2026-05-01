@@ -444,8 +444,7 @@ onBeforeUnmount(() => {
   display: grid;
 }
 
-.status-shell,
-.stage-flow {
+.status-shell {
   display: flex;
   gap: 14px;
   align-items: center;
