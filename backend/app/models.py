@@ -130,6 +130,9 @@ class LessonResult(BaseModel):
 
     title: str
     summary: str
+    stage: str = "completed"
+    progress: float = 1.0
+    detail: str = "课堂讲解已生成完成。"
     lesson_overview: dict[str, str] = Field(default_factory=dict, serialization_alias="lessonOverview")
     problem_analysis: ProblemAnalysis = Field(default_factory=ProblemAnalysis, serialization_alias="problemAnalysis")
     student_diagnosis: StudentDiagnosis = Field(default_factory=StudentDiagnosis, serialization_alias="studentDiagnosis")

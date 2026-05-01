@@ -59,10 +59,13 @@ def build_lesson_messages(
     mime_type: str,
     model_name: str,
     compact_mode: bool = False,
+    stage: str = "planning_lesson",
+    stage_detail: str = "正在组织课堂讲解结构。",
 ) -> dict[str, Any]:
     encoded_image = base64.b64encode(image_bytes).decode("ascii")
     if compact_mode:
         prompt = (
+            f"当前阶段是 {stage}，提示是：{stage_detail}。"
             "上一轮没有稳定输出 JSON。"
             "这一次请只保留最核心的 1 到 2 个讲解步骤，"
             "返回最短、最稳定的 JSON 结果。"
@@ -72,6 +75,7 @@ def build_lesson_messages(
         max_tokens = 1200
     else:
         prompt = (
+            f"当前阶段是 {stage}，提示是：{stage_detail}。"
             "请根据这张图片生成教学内容。"
             "如果图里是数学题，就分步骤解释题目与解法；"
             "如果图里是图形或公式，就解释关键概念与计算过程。"
@@ -351,6 +355,9 @@ def parse_lesson_response(raw_response: dict[str, Any]) -> LessonResult:
     return LessonResult(
         title=str(payload.get("title") or overview.get("topic") or "AI 数学讲解").strip(),
         summary=str(payload.get("summary") or "根据图片生成的讲解内容").strip(),
+        stage=str(payload.get("stage") or payload.get("lessonStage") or "completed").strip() or "completed",
+        progress=float(payload.get("progress") or 1),
+        detail=str(payload.get("detail") or payload.get("stageDetail") or "课堂讲解已生成完成。").strip(),
         lesson_overview=overview,
         problem_analysis=ProblemAnalysis(**problem_analysis),
         student_diagnosis=StudentDiagnosis(**student_diagnosis),
