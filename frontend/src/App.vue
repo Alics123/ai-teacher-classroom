@@ -60,7 +60,7 @@ const statusInfo = computed(() => {
   if (isLoading.value && selectedFile.value) {
     return {
       tone: "info",
-      title: "课堂编排中",
+      title: stage.label,
       text: `正在为 ${selectedFile.value.name} 生成讲解结果。${stage.detail}`,
       progress: stage.progress,
     };
@@ -78,7 +78,7 @@ const statusInfo = computed(() => {
   if (selectedFile.value && !visibleRecord.value) {
     return {
       tone: "pending",
-      title: "等待生成",
+      title: stage.label,
       text: "当前预览是新选择的图片；旧结果已留在最近记录中，点击“生成讲解”后才会显示新结果。",
       progress: stage.progress,
     };

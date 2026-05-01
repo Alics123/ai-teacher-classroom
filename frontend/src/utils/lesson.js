@@ -105,6 +105,59 @@ function normalizeDict(value) {
   return value && typeof value === "object" && !Array.isArray(value) ? value : {};
 }
 
+const STAGE_LABELS = {
+  validating_upload: "校验图片",
+  analyzing_problem: "识别题目",
+  planning_lesson: "规划课堂",
+  generating_scenes: "生成分镜",
+  building_voice: "整理讲稿",
+  quality_checking: "课堂质检",
+  completed: "课堂完成",
+  failed: "生成失败",
+};
+
+const STAGE_PROGRESS = {
+  validating_upload: 0.08,
+  analyzing_problem: 0.22,
+  planning_lesson: 0.4,
+  generating_scenes: 0.62,
+  building_voice: 0.78,
+  quality_checking: 0.92,
+  completed: 1,
+  failed: 0,
+};
+
+function getStageLabel(stage) {
+  return STAGE_LABELS[stage] || "课堂生成中";
+}
+
+function getStageProgress(stage, fallback = 1) {
+  return Number.isFinite(STAGE_PROGRESS[stage]) ? STAGE_PROGRESS[stage] : fallback;
+}
+
+function getStageDetail(stage) {
+  switch (stage) {
+    case "validating_upload":
+      return "正在检查图片类型、大小和可识别性。";
+    case "analyzing_problem":
+      return "正在提取题目中的关键对象与隐含条件。";
+    case "planning_lesson":
+      return "正在规划讲解顺序和课堂节奏。";
+    case "generating_scenes":
+      return "正在生成可展示的分镜 SVG。";
+    case "building_voice":
+      return "正在整理可朗读的讲稿与字幕。";
+    case "quality_checking":
+      return "正在检查 JSON 结构、分镜完整性和语音脚本。";
+    case "completed":
+      return "课堂讲解已生成完成。";
+    case "failed":
+      return "课堂生成失败，请重试或更换图片。";
+    default:
+      return "课堂生成中，请稍候。";
+  }
+}
+
 export function normalizeLesson(payload = {}) {
   const scenes = Array.isArray(payload.scenes)
     ? payload.scenes.map((scene, index) => normalizeScene(scene, index))
@@ -130,6 +183,8 @@ export function normalizeLesson(payload = {}) {
 
   const finalSummary = normalizeDict(payload.finalSummary || payload.final_summary);
 
+  const stage = String(payload.stage || payload.lessonStage || "completed");
+
   return {
     title: renderInlineMath(
       normalizeFractionSyntax(payload.title || "AI 老师讲解结果"),
@@ -137,9 +192,9 @@ export function normalizeLesson(payload = {}) {
     summary: renderInlineMath(
       normalizeFractionSyntax(payload.summary || "系统已根据图片生成分步讲解。"),
     ).replace(/<[^>]*>/g, ""),
-    stage: String(payload.stage || payload.lessonStage || "completed"),
-    progress: Number.isFinite(payload.progress) ? payload.progress : 1,
-    detail: String(payload.detail || payload.stageDetail || "课堂讲解已生成完成。"),
+    stage,
+    progress: Number.isFinite(payload.progress) ? payload.progress : getStageProgress(stage),
+    detail: String(payload.detail || payload.stageDetail || getStageDetail(stage)),
     lessonOverview: normalizeDict(payload.lessonOverview || payload.lesson_overview),
     problemAnalysis: normalizeDict(payload.problemAnalysis || payload.problem_analysis),
     studentDiagnosis: normalizeDict(payload.studentDiagnosis || payload.student_diagnosis),
