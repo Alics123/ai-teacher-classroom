@@ -98,4 +98,4 @@ async def generate_lesson_from_upload(file: UploadFile) -> dict:
             code="ai_response_parse_error",
             message=message,
         ) from exc
-    return lesson.model_dump(by_alias=True)
+    return lesson.model_dump(by_alias=True, exclude_none=True)

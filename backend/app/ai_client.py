@@ -17,12 +17,13 @@ LESSON_SYSTEM_PROMPT = """
 
 必须满足：
 1. 只输出 JSON，不要输出 markdown、解释、代码块。
-2. JSON 顶层字段固定为 title、summary、scenes。
-3. scenes 必须是数组，包含 2 到 4 个元素。
-4. 每个 scene 必须有 title、svg、narration。
-5. svg 必须是完整、可直接渲染的单个 <svg>...</svg> 字符串，使用 viewBox，禁止脚本。
-6. narration 是老师口吻的中文讲解，和当前 svg 一一对应。
-7. 内容要围绕图片里的数学知识点，解释清晰、简洁、适合语音朗读。
+2. 顶层字段建议包含 lessonOverview、problemAnalysis、studentDiagnosis、teachingPlan、scenes、sceneScripts、qualityCheck、finalSummary。
+3. scenes 必须是数组，建议 3 到 6 个元素。
+4. 每个 scene 必须至少有 title、svg、narration，并且尽量补充 purpose、visualGoal、layout、visualElements、animationOrder。
+5. 每个 scene 的 layout 必须体现课堂感，包含 topLeft、topRight、center、leftPanel、rightPanel、bottom、footer 中尽量多的位置。
+6. svg 必须是完整、可直接渲染的单个 <svg>...</svg> 字符串，使用 viewBox，禁止脚本。
+7. narration 是老师口吻的中文讲解，和当前 svg 一一对应。
+8. 内容要围绕图片里的数学知识点，解释清晰、递进、适合语音朗读。
 """.strip()
 LESSON_COMPACT_SYSTEM_PROMPT = """
 你是一名耐心的数学老师，但这次必须极度简洁。
@@ -30,9 +31,9 @@ LESSON_COMPACT_SYSTEM_PROMPT = """
 
 必须满足：
 1. 只输出 JSON。
-2. 顶层字段固定为 title、summary、scenes。
+2. 顶层字段建议包含 lessonOverview、problemAnalysis、studentDiagnosis、teachingPlan、scenes、sceneScripts、qualityCheck、finalSummary。
 3. scenes 最多 2 个。
-4. 每个 scene 只允许包含 title、svg、narration。
+4. 每个 scene 只允许包含 title、svg、narration，必要时补充最少字段。
 5. svg 必须非常简洁，只保留最基础图形和文字，不要复杂细节。
 6. narration 每段控制在 2 句以内。
 7. 不要逐字抄录整张试卷，只概括最核心的知识点或题目切入点。
@@ -266,37 +267,99 @@ def _sanitize_svg(svg: str, scene_title: str, index: int) -> str:
     return sanitized
 
 
+def _as_list(value: Any) -> list[Any]:
+    return value if isinstance(value, list) else []
+
+
+def _normalize_scene(raw_scene: dict[str, Any], index: int) -> LessonScene:
+    title = str(raw_scene.get("title") or f"步骤 {index}").strip()
+    narration = str(raw_scene.get("narration") or "").strip()
+    svg = str(raw_scene.get("svg") or "").strip()
+    layout_value = raw_scene.get("layout") if isinstance(raw_scene.get("layout"), dict) else {}
+    visual_elements = _as_list(raw_scene.get("visualElements") or raw_scene.get("visual_elements"))
+    animation_order = _as_list(raw_scene.get("animationOrder") or raw_scene.get("animation_order"))
+    return LessonScene(
+        id=str(raw_scene.get("id") or f"scene-{index}").strip(),
+        title=title,
+        purpose=str(raw_scene.get("purpose") or "").strip(),
+        visual_goal=str(raw_scene.get("visualGoal") or raw_scene.get("visual_goal") or "").strip(),
+        layout_type=str(raw_scene.get("layoutType") or raw_scene.get("layout_type") or "").strip(),
+        layout=layout_value,
+        visual_elements=visual_elements,
+        animation_order=animation_order,
+        narration=narration or f"这是第 {index} 步，请结合图示继续理解。",
+        svg=_sanitize_svg(svg, title, index),
+    )
+
+
 def parse_lesson_response(raw_response: dict[str, Any]) -> LessonResult:
     message_text, finish_reason = _extract_message_text(raw_response)
     payload = _extract_json_block(message_text, finish_reason=finish_reason)
     raw_scenes = payload.get("scenes") or []
     scenes: list[LessonScene] = []
-    for index, raw_scene in enumerate(raw_scenes[:4], start=1):
+    for index, raw_scene in enumerate(raw_scenes[:6], start=1):
         if not isinstance(raw_scene, dict):
             continue
-        title = str(raw_scene.get("title") or f"步骤 {index}").strip()
-        narration = str(raw_scene.get("narration") or "").strip()
-        svg = str(raw_scene.get("svg") or "").strip()
-        scenes.append(
-            LessonScene(
-                id=f"scene-{index}",
-                title=title,
-                narration=narration or f"这是第 {index} 步，请结合图示继续理解。",
-                svg=_sanitize_svg(svg, title, index),
-            )
-        )
+        scenes.append(_normalize_scene(raw_scene, index))
 
     if not scenes:
         raise ValueError("AI 没有生成可用的讲解场景")
+
+    raw_scene_scripts = payload.get("sceneScripts") or payload.get("scene_scripts") or []
+    scene_scripts: list[SceneVoiceScript] = []
+    for index, raw_script in enumerate(_as_list(raw_scene_scripts), start=1):
+        if not isinstance(raw_script, dict):
+            continue
+        segments = []
+        for raw_segment in _as_list(raw_script.get("voiceScriptSegments") or raw_script.get("voice_script_segments")):
+            if not isinstance(raw_segment, dict):
+                continue
+            text = str(raw_segment.get("text") or "").strip()
+            if not text:
+                continue
+            segments.append(
+                VoiceSegment(
+                    text=text,
+                    tone=str(raw_segment.get("tone") or "guiding").strip() or "guiding",
+                    pause_after=bool(raw_segment.get("pauseAfter") or raw_segment.get("pause_after") or False),
+                    duration_ms=raw_segment.get("durationMs") or raw_segment.get("duration_ms"),
+                )
+            )
+        scene_scripts.append(SceneVoiceScript(scene_id=int(raw_script.get("sceneId") or raw_script.get("scene_id") or index), voice_script_segments=segments))
+
+    if not scene_scripts:
+        scene_scripts = [
+            SceneVoiceScript(
+                scene_id=index,
+                voice_script_segments=[VoiceSegment(text=scene.narration or scene.title, tone="guiding")],
+            )
+            for index, scene in enumerate(scenes, start=1)
+        ]
 
     full_narration = str(payload.get("fullNarration") or payload.get("full_narration") or "").strip()
     if not full_narration:
         full_narration = "\n".join(scene.narration for scene in scenes if scene.narration)
 
+    overview = payload.get("lessonOverview") if isinstance(payload.get("lessonOverview"), dict) else {}
+    problem_analysis = payload.get("problemAnalysis") if isinstance(payload.get("problemAnalysis"), dict) else {}
+    student_diagnosis = payload.get("studentDiagnosis") if isinstance(payload.get("studentDiagnosis"), dict) else {}
+    teaching_plan = payload.get("teachingPlan") if isinstance(payload.get("teachingPlan"), dict) else {}
+    quality_check = payload.get("qualityCheck") if isinstance(payload.get("qualityCheck"), dict) else {}
+    final_summary = payload.get("finalSummary") if isinstance(payload.get("finalSummary"), dict) else {}
+    knowledge_pack = payload.get("knowledgePack") if isinstance(payload.get("knowledgePack"), dict) else None
+
     return LessonResult(
-        title=str(payload.get("title") or "AI 数学讲解").strip(),
+        title=str(payload.get("title") or overview.get("topic") or "AI 数学讲解").strip(),
         summary=str(payload.get("summary") or "根据图片生成的讲解内容").strip(),
+        lesson_overview=overview,
+        problem_analysis=ProblemAnalysis(**problem_analysis),
+        student_diagnosis=StudentDiagnosis(**student_diagnosis),
+        knowledge_pack=KnowledgePack(**knowledge_pack) if knowledge_pack else None,
+        teaching_plan=LessonPlan(**teaching_plan),
         scenes=scenes,
+        scene_scripts=scene_scripts,
+        quality_check=QualityCheckResult(**quality_check),
+        final_summary=final_summary,
         full_narration=full_narration,
     )
 

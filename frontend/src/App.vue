@@ -19,6 +19,7 @@ import {
   canRetryCurrentSelection,
   createFileKey,
   createLessonAppState,
+  getLessonStageSnapshot,
   getVisibleLessonRecord,
   reduceLessonAppState,
 } from "./utils/lessonState.js";
@@ -54,11 +55,14 @@ const canRetry = computed(
 );
 const voiceControlsKey = computed(() => visibleRecord.value?.id || "voice-empty");
 const statusInfo = computed(() => {
+  const stage = getLessonStageSnapshot(appState.value);
+
   if (isLoading.value && selectedFile.value) {
     return {
       tone: "info",
-      title: "AI 正在生成",
-      text: `正在为 ${selectedFile.value.name} 生成讲解结果。完成后会替换下方内容。`,
+      title: "课堂编排中",
+      text: `正在为 ${selectedFile.value.name} 生成讲解结果。${stage.detail}`,
+      progress: stage.progress,
     };
   }
 
@@ -67,29 +71,33 @@ const statusInfo = computed(() => {
       tone: "error",
       title: "生成失败",
       text: errorText.value,
+      progress: 0,
     };
   }
 
   if (selectedFile.value && !visibleRecord.value) {
     return {
       tone: "pending",
-      title: "新图片已就绪",
+      title: "等待生成",
       text: "当前预览是新选择的图片；旧结果已留在最近记录中，点击“生成讲解”后才会显示新结果。",
+      progress: stage.progress,
     };
   }
 
   if (visibleRecord.value) {
     return {
       tone: "success",
-      title: "当前结果",
+      title: "课堂完成",
       text: `当前展示的是 ${visibleRecord.value.fileName} 的讲解结果。`,
+      progress: stage.progress,
     };
   }
 
   return {
     tone: "muted",
-    title: "等待上传",
-    text: "选择一张图片后即可开始生成；最近成功结果会保存在当前浏览器里。",
+    title: stage.label,
+    text: stage.detail,
+    progress: stage.progress,
   };
 });
 
@@ -317,28 +325,51 @@ onBeforeUnmount(() => {
       />
     </section>
 
-    <section v-if="canRetry" class="status-shell status-shell--info">
+    <section class="status-shell" :class="`status-shell--${statusInfo.tone}`">
       <div class="status-copy">
-        <p class="status-label">可重试</p>
-        <p class="status-text">上一次生成失败，可直接再次点击生成。</p>
+        <p class="status-label">{{ statusInfo.title }}</p>
+        <p class="status-text">{{ statusInfo.text }}</p>
+        <div class="status-progress">
+          <span :style="{ transform: `scaleX(${statusInfo.progress ?? 0})` }"></span>
+        </div>
       </div>
-      <button type="button" class="status-button" @click="onRetry">重试</button>
+      <button
+        v-if="canRetry"
+        type="button"
+        class="status-button"
+        @click="onRetry"
+      >
+        重试
+      </button>
     </section>
 
     <section class="result-shell">
-      <LessonViewer
-        :lesson="lesson"
-        :active-scene-id="activeSceneId"
-        :playback-state="lessonPlayback"
-        @scene-select="onSceneChange"
-      />
-      <VoiceControls
-        :key="voiceControlsKey"
-        :lesson="lesson"
-        :selected-scene-id="activeSceneId"
-        @scene-change="onSceneChange"
-        @playback-state="onPlaybackStateChange"
-      />
+      <div class="result-main">
+        <LessonViewer
+          :lesson="lesson"
+          :active-scene-id="activeSceneId"
+          :playback-state="lessonPlayback"
+          @scene-select="onSceneChange"
+        />
+      </div>
+      <aside class="result-sidebar">
+        <VoiceControls
+          :key="voiceControlsKey"
+          :lesson="lesson"
+          :selected-scene-id="activeSceneId"
+          @scene-change="onSceneChange"
+          @playback-state="onPlaybackStateChange"
+        />
+        <section class="result-note">
+          <p class="result-note-kicker">教学说明</p>
+          <h3>三步完成一张图片的讲解</h3>
+          <ol>
+            <li>识别题目中的关键对象与问题。</li>
+            <li>组织成适合课堂展示的分镜。</li>
+            <li>生成可朗读、可检查的教学脚本。</li>
+          </ol>
+        </section>
+      </aside>
     </section>
 
     <section v-if="historyEntries.length" class="history-shell">
@@ -398,6 +429,22 @@ onBeforeUnmount(() => {
     inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
+.status-progress {
+  position: relative;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(215, 146, 45, 0.12);
+  overflow: hidden;
+}
+
+.status-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #ffd79e, #d7922d);
+}
+
 .status-copy {
   display: grid;
   gap: 4px;
@@ -436,6 +483,44 @@ onBeforeUnmount(() => {
 
 .result-shell {
   gap: 18px;
+}
+
+.result-main {
+  min-width: 0;
+}
+
+.result-sidebar {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.result-note {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.result-note-kicker {
+  margin: 0;
+  color: #d7922d;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.result-note h3,
+.result-note ol {
+  margin: 0;
+}
+
+.result-note ol {
+  padding-left: 18px;
+  color: rgba(42, 35, 29, 0.74);
+  line-height: 1.7;
 }
 
 .history-shell {
@@ -510,6 +595,18 @@ onBeforeUnmount(() => {
   font-size: 18px;
   line-height: 1.2;
   color: #2a231d;
+}
+
+@media (max-width: 960px) {
+  .result-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 961px) {
+  .result-shell {
+    grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.8fr);
+  }
 }
 
 @media (max-width: 720px) {

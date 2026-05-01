@@ -27,13 +27,32 @@ def test_generate_lesson_endpoint_returns_structured_payload(monkeypatch):
     fake_result = {
         "title": "三角形面积",
         "summary": "用底乘高除以二",
+        "lessonOverview": {"subject": "math", "topic": "triangle_area"},
+        "problemAnalysis": {"subject": "math", "topic": "triangle_area"},
+        "studentDiagnosis": {"studentLevel": "beginner"},
+        "teachingPlan": {"lessonGoal": "learn triangle area"},
+        "qualityCheck": {"pass": True},
+        "finalSummary": {"memoryTip": "底乘高除以二"},
         "fullNarration": "第一步先找到底和高。",
         "scenes": [
             {
                 "id": "scene-1",
                 "title": "识别图形",
+                "purpose": "introduce the problem",
+                "visualGoal": "focus on triangle",
+                "layout": {"center": "question"},
+                "visualElements": [],
+                "animationOrder": ["show_question"],
                 "svg": "<svg viewBox='0 0 320 180'></svg>",
                 "narration": "第一步先找到底和高。",
+            }
+        ],
+        "sceneScripts": [
+            {
+                "sceneId": 1,
+                "voiceScriptSegments": [
+                    {"text": "第一步先找到底和高。", "tone": "guiding", "pauseAfter": True}
+                ],
             }
         ],
     }

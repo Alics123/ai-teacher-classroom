@@ -59,26 +59,76 @@ function sanitizeNarration(text = "") {
   return renderInlineMath(normalizeFractionSyntax(String(text).trim()));
 }
 
+function normalizeList(value) {
+  return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function normalizeScene(scene = {}, index = 0) {
+  return {
+    id: scene?.id || `scene-${index + 1}`,
+    title: renderInlineMath(
+      normalizeFractionSyntax(scene?.title || `步骤 ${index + 1}`),
+    ).replace(/<[^>]*>/g, ""),
+    purpose: String(scene?.purpose || "").trim(),
+    visualGoal: String(scene?.visualGoal || scene?.visual_goal || "").trim(),
+    layoutType: String(scene?.layoutType || scene?.layout_type || "").trim(),
+    layout: scene?.layout && typeof scene.layout === "object" ? scene.layout : {},
+    visualElements: normalizeList(scene?.visualElements || scene?.visual_elements),
+    animationOrder: normalizeList(scene?.animationOrder || scene?.animation_order),
+    svg:
+      typeof scene?.svg === "string" && scene.svg.trim().startsWith("<svg")
+        ? sanitizeSvg(scene.svg)
+        : fallbackSvg(scene?.title || `步骤 ${index + 1}`),
+    narration:
+      sanitizeNarration(scene?.narration) ||
+      `这是第 ${index + 1} 步，请结合图示理解。`,
+  };
+}
+
+function normalizeVoiceScript(sceneScript = {}, index = 0) {
+  const segments = normalizeList(
+    sceneScript?.voiceScriptSegments || sceneScript?.voice_script_segments,
+  ).map((segment) => ({
+    text: sanitizeNarration(segment?.text || ""),
+    tone: String(segment?.tone || "guiding").trim() || "guiding",
+    pauseAfter: Boolean(segment?.pauseAfter || segment?.pause_after),
+    durationMs: segment?.durationMs || segment?.duration_ms || null,
+  })).filter((segment) => segment.text);
+
+  return {
+    sceneId: sceneScript?.sceneId || sceneScript?.scene_id || index + 1,
+    voiceScriptSegments: segments,
+  };
+}
+
+function normalizeDict(value) {
+  return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+}
+
 export function normalizeLesson(payload = {}) {
   const scenes = Array.isArray(payload.scenes)
-    ? payload.scenes.map((scene, index) => ({
-        id: scene?.id || `scene-${index + 1}`,
-        title: renderInlineMath(
-          normalizeFractionSyntax(scene?.title || `步骤 ${index + 1}`),
-        ).replace(/<[^>]*>/g, ""),
-        svg:
-          typeof scene?.svg === "string" && scene.svg.trim().startsWith("<svg")
-            ? sanitizeSvg(scene.svg)
-            : fallbackSvg(scene?.title || `步骤 ${index + 1}`),
-        narration:
-          sanitizeNarration(scene?.narration) ||
-          `这是第 ${index + 1} 步，请结合图示理解。`,
-      }))
+    ? payload.scenes.map((scene, index) => normalizeScene(scene, index))
     : [];
+
+  const sceneScripts = Array.isArray(payload.sceneScripts || payload.scene_scripts)
+    ? (payload.sceneScripts || payload.scene_scripts).map((sceneScript, index) => normalizeVoiceScript(sceneScript, index))
+    : scenes.map((scene, index) => ({
+        sceneId: index + 1,
+        voiceScriptSegments: [
+          {
+            text: scene.narration,
+            tone: "guiding",
+            pauseAfter: true,
+            durationMs: null,
+          },
+        ],
+      }));
 
   const fullNarration =
     sanitizeNarration(payload.fullNarration) ||
     scenes.map((scene) => scene.narration).join("\n");
+
+  const finalSummary = normalizeDict(payload.finalSummary || payload.final_summary);
 
   return {
     title: renderInlineMath(
@@ -87,7 +137,15 @@ export function normalizeLesson(payload = {}) {
     summary: renderInlineMath(
       normalizeFractionSyntax(payload.summary || "系统已根据图片生成分步讲解。"),
     ).replace(/<[^>]*>/g, ""),
+    lessonOverview: normalizeDict(payload.lessonOverview || payload.lesson_overview),
+    problemAnalysis: normalizeDict(payload.problemAnalysis || payload.problem_analysis),
+    studentDiagnosis: normalizeDict(payload.studentDiagnosis || payload.student_diagnosis),
+    knowledgePack: normalizeDict(payload.knowledgePack || payload.knowledge_pack),
+    teachingPlan: normalizeDict(payload.teachingPlan || payload.teaching_plan),
+    qualityCheck: normalizeDict(payload.qualityCheck || payload.quality_check),
+    finalSummary,
     scenes,
+    sceneScripts,
     fullNarration,
   };
 }

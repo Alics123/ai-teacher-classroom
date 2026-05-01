@@ -120,6 +120,32 @@ const reviewParagraphs = computed(() => {
     .filter(Boolean);
 });
 
+const lessonOverviewItems = computed(() => {
+  const overview = props.lesson?.lessonOverview || {};
+  return [
+    overview.subject ? `学科：${overview.subject}` : "",
+    overview.topic ? `主题：${overview.topic}` : "",
+    overview.difficulty ? `难度：${overview.difficulty}` : "",
+  ].filter(Boolean);
+});
+
+const problemPoints = computed(() => {
+  const analysis = props.lesson?.problemAnalysis || {};
+  return [
+    ...(analysis.keyElements || []),
+    ...(analysis.commonConfusions || []),
+  ].filter(Boolean);
+});
+
+const diagnosisPoints = computed(() => {
+  const diagnosis = props.lesson?.studentDiagnosis || {};
+  return [
+    ...(diagnosis.likelyBlockers || []),
+    ...(diagnosis.mustExplainBeforeSolving || []),
+    ...(diagnosis.shouldAvoid || []),
+  ].filter(Boolean);
+});
+
 const sceneLocked = computed(() => Boolean(props.playbackState?.isPlaying));
 
 function nowMs() {
@@ -284,8 +310,30 @@ onBeforeUnmount(() => {
         </div>
         <div class="lesson-header-meta">
           <span class="lesson-count">{{ scenes.length }} 个讲解步骤</span>
+          <span
+            v-for="item in lessonOverviewItems"
+            :key="item"
+            class="lesson-badge"
+          >
+            {{ item }}
+          </span>
         </div>
       </header>
+
+      <section class="lesson-insights">
+        <article class="insight-card">
+          <p class="insight-label">题目分析</p>
+          <ul class="insight-list">
+            <li v-for="point in problemPoints" :key="point">{{ point }}</li>
+          </ul>
+        </article>
+        <article class="insight-card">
+          <p class="insight-label">学情诊断</p>
+          <ul class="insight-list">
+            <li v-for="point in diagnosisPoints" :key="point">{{ point }}</li>
+          </ul>
+        </article>
+      </section>
 
       <section class="lesson-stage">
         <div class="stage-head">
@@ -471,6 +519,47 @@ h2 {
   color: #d7922d;
   font-size: 14px;
   white-space: nowrap;
+}
+
+.lesson-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  color: rgba(42, 35, 29, 0.78);
+  font-size: 13px;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.lesson-insights {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.insight-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.insight-label {
+  margin: 0;
+  color: #d7922d;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.insight-list {
+  margin: 0;
+  padding-left: 18px;
+  color: rgba(42, 35, 29, 0.72);
+  line-height: 1.65;
 }
 
 .lesson-stage {

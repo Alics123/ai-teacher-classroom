@@ -18,6 +18,9 @@ export function createLessonAppState({ history = [] } = {}) {
     history,
     lastSubmittedFileKey: "",
     selectedFileKey: "",
+    stageLabel: "等待上传",
+    stageProgress: 0,
+    stageDetail: "请选择一张图片开始生成课堂讲解。",
   };
 }
 
@@ -29,6 +32,11 @@ export function reduceLessonAppState(state, event) {
         phase: event.history?.length ? "success" : state.phase,
         history: event.history || [],
         currentRecord: state.currentRecord || event.history?.[0] || null,
+        stageLabel: event.history?.length ? "已恢复历史课堂" : state.stageLabel,
+        stageProgress: event.history?.length ? 1 : state.stageProgress,
+        stageDetail: event.history?.length
+          ? "已恢复最近一次成功生成的讲解。"
+          : state.stageDetail,
       };
     case "file-selected":
       return {
@@ -36,6 +44,11 @@ export function reduceLessonAppState(state, event) {
         phase: event.fileKey ? "ready" : state.currentRecord ? "success" : "idle",
         selectedFileKey: event.fileKey || "",
         errorText: "",
+        stageLabel: event.fileKey ? "图片已就绪" : "等待上传",
+        stageProgress: event.fileKey ? 0.15 : 0,
+        stageDetail: event.fileKey
+          ? "图片已选中，点击生成即可开始课堂编排。"
+          : "请选择一张图片开始生成课堂讲解。",
       };
     case "file-cleared":
       return {
@@ -43,6 +56,9 @@ export function reduceLessonAppState(state, event) {
         phase: state.currentRecord ? "success" : "idle",
         selectedFileKey: "",
         errorText: event.errorText || "",
+        stageLabel: event.errorText ? "选择出错" : "等待上传",
+        stageProgress: 0,
+        stageDetail: event.errorText || "请选择一张图片开始生成课堂讲解。",
       };
     case "submit-start":
       return {
@@ -51,6 +67,9 @@ export function reduceLessonAppState(state, event) {
         errorText: "",
         currentRequestId: event.requestId,
         lastSubmittedFileKey: event.fileKey,
+        stageLabel: "课堂编排中",
+        stageProgress: 0.35,
+        stageDetail: "正在分析图片内容、规划分镜和语音讲解。",
       };
     case "submit-success":
       if (event.requestId !== state.currentRequestId) {
@@ -62,6 +81,9 @@ export function reduceLessonAppState(state, event) {
         errorText: "",
         currentRecord: event.record,
         history: event.history || state.history,
+        stageLabel: "课堂生成完成",
+        stageProgress: 1,
+        stageDetail: "分镜、讲稿和总结已完成。",
       };
     case "submit-error":
       if (event.requestId !== state.currentRequestId) {
@@ -71,6 +93,9 @@ export function reduceLessonAppState(state, event) {
         ...state,
         phase: "error",
         errorText: event.errorText || "生成失败",
+        stageLabel: "生成失败",
+        stageProgress: 0,
+        stageDetail: event.errorText || "请稍后重试。",
       };
     case "history-selected":
       return {
@@ -79,6 +104,9 @@ export function reduceLessonAppState(state, event) {
         currentRecord: event.record || state.currentRecord,
         selectedFileKey: "",
         errorText: "",
+        stageLabel: "已切换历史课堂",
+        stageProgress: 1,
+        stageDetail: "正在展示此前成功生成的讲解结果。",
       };
     case "request-cancelled":
       if (event.requestId !== state.currentRequestId) {
@@ -88,6 +116,11 @@ export function reduceLessonAppState(state, event) {
         ...state,
         phase: state.selectedFileKey ? "ready" : state.currentRecord ? "success" : "idle",
         errorText: "",
+        stageLabel: state.selectedFileKey ? "已取消生成" : "等待上传",
+        stageProgress: state.selectedFileKey ? 0.15 : 0,
+        stageDetail: state.selectedFileKey
+          ? "生成已取消，可重新点击生成。"
+          : "请选择一张图片开始生成课堂讲解。",
       };
     default:
       return state;
@@ -112,4 +145,12 @@ export function canRetryCurrentSelection(state) {
       state.selectedFileKey &&
       state.selectedFileKey === state.lastSubmittedFileKey,
   );
+}
+
+export function getLessonStageSnapshot(state) {
+  return {
+    label: state.stageLabel || "等待上传",
+    progress: Number.isFinite(state.stageProgress) ? state.stageProgress : 0,
+    detail: state.stageDetail || "请选择一张图片开始生成课堂讲解。",
+  };
 }

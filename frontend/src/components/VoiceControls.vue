@@ -56,6 +56,14 @@ const statusText = computed(() => {
   return "点击开始朗读后，字幕会按照讲解节奏自动同步。";
 });
 const isWarningStatus = computed(() => !isSupported || Boolean(playbackError.value));
+const currentSceneScript = computed(() => {
+  const scripts = Array.isArray(props.lesson?.sceneScripts)
+    ? props.lesson.sceneScripts
+    : [];
+  const activeScript = scripts.find((item) => String(item.sceneId) === String(props.selectedSceneId)) || scripts[0] || null;
+  return activeScript;
+});
+const scriptSegments = computed(() => currentSceneScript.value?.voiceScriptSegments || []);
 
 const selectionTracker = createSpeechSelectionTracker();
 const playbackMachine = isSupported
@@ -211,6 +219,16 @@ onBeforeUnmount(() => {
       </button>
     </div>
 
+    <div v-if="scriptSegments.length" class="voice-script">
+      <p class="voice-script-label">当前分镜讲稿</p>
+      <ul class="voice-script-list">
+        <li v-for="(segment, index) in scriptSegments" :key="`${index}-${segment.text}`">
+          <strong>{{ segment.tone }}</strong>
+          <span>{{ segment.text }}</span>
+        </li>
+      </ul>
+    </div>
+
     <p class="voice-status" :class="{ 'voice-status--warning': isWarningStatus }">
       {{ statusText }}
     </p>
@@ -256,6 +274,36 @@ onBeforeUnmount(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.voice-script {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.voice-script-label {
+  margin: 0;
+  color: #d7922d;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.voice-script-list {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 8px;
+  color: rgba(42, 35, 29, 0.74);
+}
+
+.voice-script-list strong {
+  margin-right: 8px;
+  color: #2a231d;
 }
 
 .voice-button {
