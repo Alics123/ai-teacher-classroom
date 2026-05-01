@@ -20,6 +20,7 @@ import {
   createFileKey,
   createLessonAppState,
   getLessonStageSnapshot,
+  getLessonStageSteps,
   getVisibleLessonRecord,
   reduceLessonAppState,
 } from "./utils/lessonState.js";
@@ -54,12 +55,13 @@ const canRetry = computed(
     canRetryCurrentSelection(appState.value),
 );
 const voiceControlsKey = computed(() => visibleRecord.value?.id || "voice-empty");
+const stageSteps = computed(() => getLessonStageSteps(appState.value));
 const statusInfo = computed(() => {
   const stage = getLessonStageSnapshot(appState.value);
 
   if (isLoading.value && selectedFile.value) {
     return {
-      tone: "info",
+      tone: stage.label === "课堂质检" ? "warning" : "info",
       title: stage.label,
       text: `正在为 ${selectedFile.value.name} 生成讲解结果。${stage.detail}`,
       progress: stage.progress,
@@ -87,7 +89,7 @@ const statusInfo = computed(() => {
   if (visibleRecord.value) {
     return {
       tone: "success",
-      title: "课堂完成",
+      title: stage.label,
       text: `当前展示的是 ${visibleRecord.value.fileName} 的讲解结果。`,
       progress: stage.progress,
     };
@@ -343,6 +345,30 @@ onBeforeUnmount(() => {
       </button>
     </section>
 
+    <section class="stage-flow">
+      <div class="stage-flow-head">
+        <p class="stage-flow-kicker">阶段流程</p>
+        <h3>课堂生成进度</h3>
+      </div>
+      <ol class="stage-flow-list">
+        <li
+          v-for="step in stageSteps"
+          :key="step.label"
+          class="stage-flow-item"
+          :class="{
+            'stage-flow-item--done': step.done,
+            'stage-flow-item--active': step.active,
+          }"
+        >
+          <span class="stage-flow-dot"></span>
+          <div class="stage-flow-copy">
+            <strong>{{ step.label }}</strong>
+            <span>{{ step.detail }}</span>
+          </div>
+        </li>
+      </ol>
+    </section>
+
     <section class="result-shell">
       <div class="result-main">
         <LessonViewer
@@ -413,7 +439,8 @@ onBeforeUnmount(() => {
   display: grid;
 }
 
-.status-shell {
+.status-shell,
+.stage-flow {
   display: flex;
   gap: 14px;
   align-items: center;
@@ -445,7 +472,8 @@ onBeforeUnmount(() => {
   background: linear-gradient(90deg, #ffd79e, #d7922d);
 }
 
-.status-copy {
+.status-copy,
+.stage-flow-head {
   display: grid;
   gap: 4px;
 }
@@ -455,7 +483,9 @@ onBeforeUnmount(() => {
 .history-kicker,
 .history-description,
 .history-file,
-.history-time {
+.history-time,
+.stage-flow-kicker,
+.stage-flow h3 {
   margin: 0;
 }
 
@@ -471,6 +501,43 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   padding: 10px 16px;
   background: rgba(255, 255, 255, 0.96);
+  color: #2a231d;
+}
+
+.stage-flow-list {
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.stage-flow-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: rgba(42, 35, 29, 0.65);
+}
+
+.stage-flow-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(42, 35, 29, 0.18);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+}
+
+.stage-flow-item--done .stage-flow-dot {
+  background: #d7922d;
+}
+
+.stage-flow-item--active .stage-flow-dot {
+  background: linear-gradient(180deg, #ffd79e, #d7922d);
+  box-shadow: 0 0 0 8px rgba(215, 146, 45, 0.14);
+}
+
+.stage-flow-item--done,
+.stage-flow-item--active {
   color: #2a231d;
 }
 

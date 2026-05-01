@@ -154,3 +154,34 @@ export function getLessonStageSnapshot(state) {
     detail: state.stageDetail || "请选择一张图片开始生成课堂讲解。",
   };
 }
+
+export function getLessonStageSteps(state) {
+  const current = state.stageLabel || "等待上传";
+  const steps = [
+    {
+      label: "等待上传",
+      detail: "选择图片进入课堂生成流程。",
+      done: current !== "等待上传",
+      active: current === "等待上传",
+    },
+    {
+      label: "图片已就绪",
+      detail: "图片已选中，准备开始分析。",
+      done: ["图片已就绪", "课堂编排中", "课堂生成完成", "已切换历史课堂"].includes(current),
+      active: current === "图片已就绪",
+    },
+    {
+      label: "课堂编排中",
+      detail: "分析题目、规划结构、组织讲解。",
+      done: ["课堂编排中", "课堂生成完成", "已切换历史课堂"].includes(current),
+      active: current === "课堂编排中",
+    },
+    {
+      label: "课堂生成完成",
+      detail: "分镜、讲稿和总结已准备好。",
+      done: ["课堂生成完成", "已切换历史课堂"].includes(current),
+      active: current === "课堂生成完成",
+    },
+  ];
+  return steps;
+}
