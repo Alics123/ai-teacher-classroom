@@ -137,6 +137,9 @@ export function normalizeLesson(payload = {}) {
     summary: renderInlineMath(
       normalizeFractionSyntax(payload.summary || "系统已根据图片生成分步讲解。"),
     ).replace(/<[^>]*>/g, ""),
+    stage: String(payload.stage || payload.lessonStage || "completed"),
+    progress: Number.isFinite(payload.progress) ? payload.progress : 1,
+    detail: String(payload.detail || payload.stageDetail || "课堂讲解已生成完成。"),
     lessonOverview: normalizeDict(payload.lessonOverview || payload.lesson_overview),
     problemAnalysis: normalizeDict(payload.problemAnalysis || payload.problem_analysis),
     studentDiagnosis: normalizeDict(payload.studentDiagnosis || payload.student_diagnosis),

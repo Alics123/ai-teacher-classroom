@@ -37,6 +37,12 @@ def _extract_upstream_error_message(response: httpx.Response) -> str:
 
 
 async def generate_lesson_from_upload(file: UploadFile) -> dict:
+    stage = {
+        "stage": "validating_upload",
+        "progress": 0.08,
+        "detail": "正在检查图片类型与大小。",
+    }
+
     content_type = (file.content_type or "").lower()
     if not content_type.startswith("image/"):
         raise LessonGenerationError(
@@ -98,4 +104,9 @@ async def generate_lesson_from_upload(file: UploadFile) -> dict:
             code="ai_response_parse_error",
             message=message,
         ) from exc
-    return lesson.model_dump(by_alias=True, exclude_none=True)
+    result = lesson.model_dump(by_alias=True, exclude_none=True)
+    result.update(stage)
+    result["stage"] = "completed"
+    result["progress"] = 1
+    result["detail"] = "课堂讲解已生成完成。"
+    return result
